@@ -111,7 +111,7 @@ const App = () => {
     console.log("handle new number ", event.target.value)
     setNewNumber(event.target.value)
   } 
-  //Filter variable stores filter and it is passed to contact module 
+  
   const handleFilterChange = (event) => {
     console.log("handle filter change", event.target.value)
     setNewFilter(event.target.value)
