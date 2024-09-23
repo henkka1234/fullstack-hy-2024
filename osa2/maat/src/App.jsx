@@ -10,8 +10,32 @@ const CountryFilter = (props) => {
   )
 }
 
-const DetailedInformation = (props) => {
+const CurrentWeather = (props) => {
+  //API KEY
+  const api_key = import.meta.env.VITE_WEATHER_KEY
   
+  const [currentweather, setWeather] = useState([])
+  useEffect(() => {axios.get(`https://api.openweathermap.org/data/2.5/weather?lat=${props.lat}&lon=${props.lon}&units=metric&appid=${api_key}`).then(response => {
+    console.log("get weather for lat " + props.lat + " and lon " + props.lon)
+    setWeather(response.data)
+  })
+  .catch(error=>{
+    console.log("Error happened " + error)
+  })},[props])
+
+  if(currentweather.length !== 0){
+    return(
+      <div>
+        {console.log("weather ", currentweather.weather[0].icon)}
+        <p>temperature {currentweather.main.temp} Celcius</p>
+        <img src={`https://openweathermap.org/img/wn/${currentweather.weather[0].icon}@2x.png`}></img>
+        <p>wind {currentweather.wind.speed} m/s</p>
+      </div>
+    )
+  }
+}
+
+const DetailedInformation = (props) => {
   const [details, setDetails] = useState([])
   useEffect(() => {axios.get(`https://studies.cs.helsinki.fi/restcountries/api/name/${props.country}`).then(response => {
     console.log("get details of country " + props.country)
@@ -19,31 +43,30 @@ const DetailedInformation = (props) => {
   })
   .catch(error=>{
     console.log("Error happened " + error)
-  })},[])
+  })},[props.country])
 
   //This prevents crashing when details is still empty
   if(details.length !== 0){
     console.log("was not null")
   return(
     <div>
-      {console.log("detailssit 2 " + details.languages)}
+      {console.log("detailssit 2 ", details.capitalInfo.latlng[0])}
       <h1>{details.name.common}</h1>
       <p>capital {details.capital[0]}</p>
       <p>area {details.area}</p>
       <h3>languages:</h3>
+      <ul>
+          {Object.values(details.languages).map((language) => {
+            console.log("language " + language  )
+            return <li key={language}>{language}</li>
+          })}
+        </ul>      
       <img src={details.flags["png"]} alt="flag"></img>
+      <h2>Weather in {details.capital[0]}</h2>
+      <CurrentWeather lat={details.capitalInfo.latlng[0]} lon={details.capitalInfo.latlng[1]} />
     </div>
   )
   }
-}
-
-const callDetails = (countryParameter) => {
-  console.log("call details for " + countryParameter)
-  return(
-    <div>
-      <DetailedInformation country={countryParameter} />
-    </div>
-  )
 }
 
 const ShowResults = (props) => {
@@ -57,7 +80,7 @@ const ShowResults = (props) => {
   if(props.results.length <10 && props.results.length > 1){
     return(
       <div>
-        {props.results.map(country => <li key={country}>{country} <button onClick={() => callDetails(country)}>show</button> </li>)}
+        {props.results.map(country => <li key={country}>{country} <button onClick={() => props.onShowDetails(country)}>show</button> </li>)}
       </div>
     )
   }
@@ -82,6 +105,7 @@ function App() {
   const [country, setCountry] = useState("")
   const [allCountries, setAllCountries] = useState([])
   const [resultCountries, setResultCountries] = useState([])
+  const [selectedCountry, setSelectedCountry] = useState(null)
 
   const handleFilterChange = (event) => {
     setCountry(event.target.value)
@@ -89,6 +113,7 @@ function App() {
     console.log("handle filter change",event.target.value)
     console.log(filteredResults)
     setResultCountries(filteredResults)
+    setSelectedCountry(null)
     if(filteredResults.length>10){
       console.log("Too many countries")
     }
@@ -100,8 +125,10 @@ function App() {
     if(filteredResults.length<10 && filteredResults.length>1){
       console.log("Show filter results")
     }
-    
+  }
 
+  const handleShowDetails = (country) => {
+    setSelectedCountry(country)
   }
 
   useEffect(() => {
@@ -121,7 +148,8 @@ function App() {
     <div>
       <h3>Countries</h3>
       <CountryFilter newFilterProp={country} handleFilterChangeFunc={handleFilterChange} />
-      <ShowResults results={resultCountries} />
+      <ShowResults results={resultCountries} onShowDetails={handleShowDetails}/>
+      {selectedCountry && <DetailedInformation country={selectedCountry} />}
     </div>
   )
 }
