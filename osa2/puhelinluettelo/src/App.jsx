@@ -71,25 +71,31 @@ const App = () => {
 
     if(persons.some(person => person.name === newName)){
       const duplicatePerson = persons.find((person) => person.name === newName)
+      console.log("duplicate is", duplicatePerson)
       const changedPerson = {...duplicatePerson, number: newNumber}
       if(confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)){
         personService.update(duplicatePerson.id, changedPerson)
         .then(responsePerson => {
-          console.log(responsePerson)
-          setPersons(persons.map(person => person.id !== duplicatePerson.id ? person : responsePerson.data))
+          //console.log(responsePerson.data)
+          setPersons(persons.map(person => 
+            person.id === duplicatePerson.id ? responsePerson.data : person
+          ))
+          setType("success")
+          setMessage("Updated " + newName)
           setNewName('')
           setNewNumber('')
         })
         .catch(error => {
-          console.log("Tried to update deleted contact!!!")
+          //Should make different messages for different errors
+          console.log("Tried to update deleted contact!!!", error)
           setType("error")
-          setMessage("Information of " + duplicatePerson.name + " has already been deleted from server")
+          setMessage("Information of " + duplicatePerson.name + " has already been deleted from server or there was an input validation error")
         })
       }
     }
 
     else{
-
+      console.log("creating...")
     personService.create(contactObject)
           .then(responsePerson => {
             console.log(responsePerson)
@@ -98,6 +104,11 @@ const App = () => {
             setMessage("Added " + newName)
             setNewName('')
             setNewNumber('')
+          })
+          .catch(error => {
+            setType("error")
+            console.log(error.response.data)
+            setMessage(error.response.data.error)
           })
     }
   }
