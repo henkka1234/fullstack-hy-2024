@@ -26,7 +26,7 @@ describe('API integration tests', () => {
         .expect('Content-Type', /application\/json/)
     })
 
-    test('there are two notes', async () => {
+    test('there are two blogs', async () => {
         const response = await api.get('/api/blogs')
     
         assert.strictEqual(response.body.length, helper.initialBlogs.length)
