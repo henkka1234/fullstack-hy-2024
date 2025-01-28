@@ -42,8 +42,9 @@ const App = () => {
   const blogFormRef = useRef()
 
   useEffect(() => {
-    blogService.getAll().then(blogs =>
-      setBlogs( blogs )
+    blogService.getAll().then(blogs =>{
+      console.log(blogs)
+      setBlogs( blogs )}
     )  
   }, [])
 
@@ -86,7 +87,9 @@ const App = () => {
   const addBlog = async (blogObject) => {
     blogFormRef.current.toggleVisibility()
     const returnedBlog = await blogService.create(blogObject)
-    setBlogs(blogs.concat(returnedBlog))
+    const modified = {...returnedBlog, user}
+    console.log("modified blog:", modified)
+    setBlogs(blogs.concat(modified))
     setType('success');
     setMessage(`A new blog "${blogObject.title}" by "${blogObject.author}" added!`);
     setTimeout(() => {
