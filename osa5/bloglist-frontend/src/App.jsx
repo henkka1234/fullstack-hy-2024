@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import './index.css'
+import Togglable from './components/Toggable'
 import Blog from './components/Blog'
+import BlogForm from './components/BlogForm'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import Login from './services/login'
@@ -25,6 +27,8 @@ const Notification = ({type, msg }) => {
     )    
   }
 }
+
+
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -83,18 +87,6 @@ const App = () => {
     }
   }
 
-  const handleTitleChange = (event) =>{
-    setNewTitle(event.target.value)
-  }
-
-  const handleAuthorChange = (event) =>{
-    setNewAuthor(event.target.value)
-  }
-
-  const handleUrlChange = (event) =>{
-    setNewUrl(event.target.value)
-  }  
-
   const addBlog = async (event) => {
     event.preventDefault()
     const blogObject = {
@@ -141,35 +133,21 @@ const App = () => {
         </form>
   )
 
-  const blogForm = () => (
-    
-    <form onSubmit={addBlog}>
-      <div>
-      Title:
-      <input
-        value={newTitle}
-        onChange={handleTitleChange}
-      />
-      </div>
-
-      <div>
-      Author:
-      <input
-        value={newAuthor}
-        onChange={handleAuthorChange}
-      />
-      </div>
-
-      <div>
-        Url:
-      <input
-        value={newUrl}
-        onChange={handleUrlChange}
-      />
-      </div>
-      <button type="submit">save</button>
-    </form>  
-  )
+  const blogForm = () =>{
+    return(
+      <Togglable buttonLabel="new blog">
+          <BlogForm
+            newTitle={newTitle}
+            newAuthor={newAuthor}
+            newUrl={newUrl}
+            handleTitleChange={({target}) => setNewTitle(target.value)}
+            handleAuthorChange={({target}) => setNewAuthor(target.value)}
+            handleUrlChange={({target}) => setNewUrl(target.value)}
+            handleAddBlog={addBlog}
+          />
+      </Togglable>
+    )
+  }
 
   const logoutUser = () => {
     console.log("logoutuser")
