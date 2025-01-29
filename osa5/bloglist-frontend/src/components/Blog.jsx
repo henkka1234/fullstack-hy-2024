@@ -1,6 +1,6 @@
 import { useState } from "react"
 
-const Blog = ({ blog, updateBlog }) => {
+const Blog = ({ blog, updateBlog, userid, deleteBlog }) => {
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -11,7 +11,6 @@ const Blog = ({ blog, updateBlog }) => {
 
   const [visible, setVisible] = useState(false)
 
-  const hideWhenVisible = { display: visible ? 'none' : '' }
   const showWhenVisible = { display: visible ? '' : 'none' }
   
   const toggleView = () => {
@@ -30,6 +29,15 @@ const Blog = ({ blog, updateBlog }) => {
     }, blog.user, blog.id)
   }    
 
+  const showRemove = { display: blog.user.username===userid ? '' : 'none'}
+
+  const removeBlog = async (event) =>{
+    console.log("useid",userid)
+    console.log("blog user", blog.user.username)
+    if(window.confirm(`delete blog "${blog.title}" by "${blog.author}" ?`)){
+    deleteBlog(blog.id)
+    }
+  }
   return(  
 
     <div style={blogStyle}>
@@ -38,6 +46,9 @@ const Blog = ({ blog, updateBlog }) => {
         <p>url: {blog.url}</p>
         <p>likes: {blog.likes} <button onClick={likeBlog}>Like</button> </p> 
         <p>posted by: {blog.user.name}</p>
+      </div>
+      <div style={showRemove}>
+        <button onClick={removeBlog}>remove</button>
       </div>
     </div>  
 
