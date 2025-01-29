@@ -87,6 +87,7 @@ const App = () => {
   const addBlog = async (blogObject) => {
     blogFormRef.current.toggleVisibility()
     const returnedBlog = await blogService.create(blogObject)
+    //the username should be the same as the logged in user
     const modified = {...returnedBlog, user}
     console.log("modified blog:", modified)
     setBlogs(blogs.concat(modified))
@@ -97,6 +98,13 @@ const App = () => {
       setMessage(null);
     }, 5000);
   } 
+
+  const likeBlog = async (blogObject, user, id) => {
+    const returnedBlog = await blogService.update(blogObject, id)
+    //backend doesn't have user in it's reponse so add it back manually
+    const modified = {...returnedBlog, user: user}
+    setBlogs(blogs.map(blog => blog.id === id ? modified: blog))
+  }
 
   const loginForm = () => (
     <form onSubmit={handleLogin}>        
@@ -157,7 +165,7 @@ const App = () => {
         {blogForm()}
         
         {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} />
+          <Blog key={blog.id} blog={blog} updateBlog={likeBlog} />
         )}
         
         </div>}
