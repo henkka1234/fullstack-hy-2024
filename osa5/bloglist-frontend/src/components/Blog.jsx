@@ -29,8 +29,9 @@ const Blog = ({ blog, updateBlog, userid, deleteBlog }) => {
       likes: blog.likes+1
     }, blog.user, blog.id)
   }
-
-  const showRemove = { display: blog.user.username===userid ? '' : 'none' }
+  
+  //If the blog doesn't have user (maybe deleted user), don't show the remove button
+  const showRemove = { display: blog.user && blog.user.username===userid ? '' : 'none' }
 
   const removeBlog = async (event) => {
     console.log('useid',userid)
@@ -45,8 +46,10 @@ const Blog = ({ blog, updateBlog, userid, deleteBlog }) => {
       <p>{blog.title} {blog.author} <button onClick={toggleView}>{!visible ? 'view' : 'hide'}</button></p>
       <div style={showWhenVisible} className='extrainfo'>
         <p className='url'>url: {blog.url}</p>
-        <p className='likes'>likes: {blog.likes} <button onClick={likeBlog}>Like</button> </p>
-        <p className='postedby'>posted by: {blog.user.name}</p>
+        <p className='likes'
+            data-testid='likes'>likes: {blog.likes} <button onClick={likeBlog}>Like</button> </p>
+        {/*Add some protection against undefined users, like in a case where the user is deleted*/}
+        <p className='postedby'>posted by: {blog.user?.name ?? 'deleted user'}</p>
       </div>
       <div style={showRemove}>
         <button onClick={removeBlog}>remove</button>
